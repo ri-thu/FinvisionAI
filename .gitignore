@@ -1,0 +1,78 @@
+# General
+.DS_Store
+Thumbs.db
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.swp
+.venv/
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+*.egg
+*.pyc
+migrations/
+
+# Django
+db.sqlite3
+/media/
+*.db
+*.sqlite3
+*.pyo
+*.pyd
+*.cover
+instance/
+config/settings/local.py
+config/settings/*.env
+config/settings/.env
+config/.env
+.env
+.env.*
+
+# FastAPI
+*.db
+*.sqlite3
+logs/
+*.pid
+
+# Flutter / Dart
+**/android/.gradle/
+**/android/app/debug.keystore
+**/android/key.properties
+**/android/.idea/
+**/android/local.properties
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/.pub-cache/
+**/pubspec.lock
+**/ios/Pods/
+**/ios/.generated/
+**/.vscode/
+**/.idea/
+
+# VSCode / JetBrains
+.vscode/
+.idea/
+
+# Node.js (if using JS/TS in your project)
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnp/
+.pnp.js
+
+# Miscellaneous
+*.iml
+*.ipr
+*.iws
+*.bak
+*.orig
+*.sw?
