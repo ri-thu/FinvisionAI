@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'media_selection_page.dart';  // Import your media selection screen
+import 'media_selection_page.dart';  // Import media selection screen
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Media Picker App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MediaSelectionPage(), // Load the media selection screen
+      home: const MediaSelectionPage(), // Load media selection screen
     );
   }
 }
