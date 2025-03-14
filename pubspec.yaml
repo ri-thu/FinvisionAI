@@ -30,12 +30,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_fonts: ^6.1.0
+  dynamic_color: ^1.6.5
+  cupertino_icons: ^1.0.8
+
+    # Image and Speech Processing
+  image_picker: ^1.0.7
+  speech_to_text: ^7.0.0
+  image_picker_ios: ^0.8.12+2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  image_picker: ^1.0.7  # <-- Add this line
-  speech_to_text: ^7.0.0
 
 dev_dependencies:
   flutter_test:
