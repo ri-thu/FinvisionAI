@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'settings_page.dart';
+import 'suggestions_page.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -41,7 +43,7 @@ class _MainPageState extends State<MediaSelectionPage> {
   final List<Widget> _pages = [
     const ExpenseScannerPage(),
     const InsightsPage(),
-    const Center(child: Text("Budgets Page")),
+    const SuggestionsPage(),
     const SettingsPage(),
   ];
 
@@ -60,8 +62,8 @@ class _MainPageState extends State<MediaSelectionPage> {
         onDestinationSelected: _onItemTapped,
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Transactions'),
-          NavigationDestination(icon: Icon(Icons.credit_card), label: 'Insights'),
-          NavigationDestination(icon: Icon(Icons.pie_chart), label: 'Budgets'),
+          NavigationDestination(icon: Icon(Icons.timeline), label: 'Insights'),
+          NavigationDestination(icon: Icon(Icons.lightbulb), label: 'suggestion'),
           NavigationDestination(icon: Icon(Icons.more_horiz), label: 'More'),
         ],
       ),
@@ -109,7 +111,7 @@ class _InsightsPageState extends State<InsightsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Insights"),
-        backgroundColor: const Color(0xFFB8B230),
+        backgroundColor: const Color(0xFF00359E),
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
@@ -135,7 +137,7 @@ class _InsightsPageState extends State<InsightsPage> {
               ElevatedButton(
                 onPressed: fetchInsights,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF9C0A7C),
+                  backgroundColor: const Color(0xFF00359E),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

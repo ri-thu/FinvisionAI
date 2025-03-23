@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'media_selection_page.dart'; // Import the ExpenseScanner as MediaSelectionPage
 import 'settings_page.dart'; // Import the SettingsPage
 import 'insights_page.dart'; // Assuming we'll move the insights page to a separate file
+import 'suggestions_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,6 +37,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MediaSelectionPage(),
         '/settings': (context) => const SettingsPage(),
+        '/suggestions': (context) => const SuggestionsPage(),
+        //'/insights': (context) => const InsightsPage(), // Add the new route// Add the new route
       },
     );
   }

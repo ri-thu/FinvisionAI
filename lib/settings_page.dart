@@ -1,7 +1,34 @@
+// settings_page.dart
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
+
+  // User Agreement Text
+  final String _userAgreementText = """
+  **User Agreement**
+
+  Welcome to FinvisionAI. By using our application, you agree to the following terms and conditions:
+
+  **1. Terms of Service**
+  - You must be at least 18 years old to use this application.
+  - You agree to use the application only for lawful purposes.
+
+  **2. Privacy Policy**
+  - We collect and use your personal data to provide and improve our services.
+  - Your data will be handled in accordance with our Privacy Policy.
+
+  **3. Intellectual Property**
+  - All content provided by FinvisionAI is protected by copyright laws.
+
+  **4. Disclaimer**
+  - FinvisionAI is not liable for any damages arising from the use of this application.
+
+  **5. Termination**
+  - We reserve the right to terminate or suspend your access to the application at any time.
+
+  By continuing to use FinvisionAI, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions.
+  """;
 
   @override
   Widget build(BuildContext context) {
@@ -19,44 +46,48 @@ class SettingsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // General Settings Section
-            ListTile(
-              title: const Text('Theme'),
-              subtitle: const Text('Change the app theme'),
-              leading: const Icon(Icons.color_lens),
-              onTap: () {
-                // Action to change theme
-              },
-            ),
-            ListTile(
-              title: const Text('Notifications'),
-              subtitle: const Text('Enable/Disable notifications'),
-              leading: const Icon(Icons.notifications),
-              onTap: () {
-                // Action to toggle notifications
-              },
-            ),
-            ListTile(
-              title: const Text('Language'),
-              subtitle: const Text('Change language preferences'),
-              leading: const Icon(Icons.language),
-              onTap: () {
-                // Action to change language
-              },
-            ),
-            // Other settings can be added below
+            // User Agreement
             ListTile(
               title: const Text('User Agreement'),
               subtitle: const Text('More on licensing'),
               leading: const Icon(Icons.lock),
               onTap: () {
-                // Action for privacy settings
+                _showUserAgreement(context);
               },
             ),
             // Add more settings options as needed
           ],
         ),
       ),
+    );
+  }
+
+  void _showUserAgreement(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("User Agreement"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text(
+                  _userAgreementText,
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
