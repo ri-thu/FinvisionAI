@@ -1,4 +1,3 @@
-// insights_page.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,31 +6,65 @@ import 'package:fl_chart/fl_chart.dart';
 
 class InsightsPage extends StatefulWidget {
   const InsightsPage({super.key});
+
   @override
   _InsightsPageState createState() => _InsightsPageState();
 }
 
 class _InsightsPageState extends State<InsightsPage> {
-  String insights = "Press the button to get insights.";
-  List<Map<String, double>> dailyExpenditure = [];
+  String insights = "Loading insights...";
+  List<Map<String, dynamic>> dailyExpenditure = [];
   Map<String, double> categoryExpenditure = {};
   String recommendations = "Fetching recommendations...";
 
+  @override
+  void initState() {
+    super.initState();
+    // Call fetchInsights when the page initializes
+    fetchInsights();
+  }
+
   Future<void> fetchInsights() async {
-    const url = "http://192.168.1.41:8000/generate_insights/"; // Replace with actual IP
+    const url = "http://10.0.2.2:8000/analyze-finances"; // Replace with actual IP
     try {
+      print("Attempting to connect to: $url");
+
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"expense_data": "Your expense details here"}),
+        body: jsonEncode({
+          "income": 7500.00,
+          "expenses": {
+            "Rent": 2000.00,
+            "Utilities": 150.50,
+            "Groceries": 700.00,
+            "Transport": 250.00,
+            "Insurance": 120.00,
+            "Phone Bill": 80.00,
+            "Subscriptions": 45.00
+          },
+          "savings_goals": {
+            "Emergency Fund": 10000.00,
+            "Vacation": 3000.00,
+            "New Laptop": 1500.00
+          },
+          "discretionary_percentage": 0.15
+        }),
       );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          insights = data['insights'] ?? "No insights found.";
-          dailyExpenditure = List<Map<String, double>>.from(data['daily_expenditure'] ?? []);
-          categoryExpenditure = Map<String, double>.from(data['category_expenditure'] ?? {});
-          recommendations = data['recommendations'] ?? "No recommendations available.";
+          insights = data['analysis'] ?? "No insights found."; // Note: changed from 'insights' to 'analysis'
+
+          // These fields might not be in your API response based on your FastAPI code
+          // You might need to adjust or remove these lines
+          //dailyExpenditure = List<Map<String, dynamic>>.from(data['daily_expenditure'] ?? []);
+          //categoryExpenditure = Map<String, double>.from(data['category_expenditure'] ?? {});
+          //recommendations = data['recommendations'] ?? "No recommendations available.";
         });
       } else {
         setState(() {
@@ -40,8 +73,9 @@ class _InsightsPageState extends State<InsightsPage> {
         });
       }
     } catch (e) {
+      print("Exception details: ${e.toString()}");
       setState(() {
-        insights = "Network Error: Failed to fetch insights.";
+        insights = "Network Error: Failed to fetch insights. ${e.toString()}";
         recommendations = "Failed to fetch recommendations.";
       });
     }
@@ -74,7 +108,6 @@ class _InsightsPageState extends State<InsightsPage> {
               ),
             ),
             const SizedBox(height: 20),
-
             // Waveform Chart for Daily Expenditure
             if (dailyExpenditure.isNotEmpty)
               Card(
@@ -93,67 +126,69 @@ class _InsightsPageState extends State<InsightsPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      LineChart(
-                        LineChartData(
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: dailyExpenditure.map((data) {
-                                final day = DateTime.parse(data['date'] as String);
-                                final expenditure = data['amount'];
-                                return FlSpot(day.day.toDouble(), expenditure!);
-                              }).toList(),
-                              isCurved: true,
-                              color: const Color(0xFF9C0A7C),
-                              barWidth: 4,
-                              dotData: FlDotData(show: false),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xFF9C0A7C).withOpacity(0.3),
-                                    const Color(0xFF9C0A7C).withOpacity(0),
-                                  ],
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
+                      SizedBox(
+                        height: 200,
+                        child: LineChart(
+                          LineChartData(
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: dailyExpenditure.map((data) {
+                                  final day = DateTime.parse(data['date'] as String);
+                                  final expenditure = data['amount'] as double;
+                                  return FlSpot(day.day.toDouble(), expenditure);
+                                }).toList(),
+                                isCurved: true,
+                                color: const Color(0xFF9C0A7C),
+                                barWidth: 4,
+                                dotData: FlDotData(show: false),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFF9C0A7C).withOpacity(0.3),
+                                      const Color(0xFF9C0A7C).withOpacity(0),
+                                    ],
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            gridData: FlGridData(show: false),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    final date = DateTime.now().subtract(Duration(days: dailyExpenditure.length - value.toInt()));
+                                    return Text(
+                                      "${date.day}/${date.month}",
+                                      style: const TextStyle(fontSize: 12),
+                                    );
+                                  },
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      value.toStringAsFixed(0),
+                                      style: const TextStyle(fontSize: 12),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
-                          ],
-                          gridData: FlGridData(show: false),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  final date = DateTime.now().subtract(Duration(days: dailyExpenditure.length - value.toInt()));
-                                  return Text(
-                                    "${date.day}/${date.month}",
-                                    style: const TextStyle(fontSize: 12),
-                                  );
-                                },
-                              ),
-                            ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  return Text(
-                                    value.toStringAsFixed(0),
-                                    style: const TextStyle(fontSize: 12),
-                                  );
-                                },
-                              ),
-                            ),
+                            borderData: FlBorderData(show: false),
                           ),
-                          borderData: FlBorderData(show: false),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-
             // Bar Chart for Category Expenditure
             if (categoryExpenditure.isNotEmpty)
               Card(
@@ -172,76 +207,70 @@ class _InsightsPageState extends State<InsightsPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      BarChart(
-                        BarChartData(
-                          barGroups: categoryExpenditure.entries.map((entry) {
-                            return BarChartGroupData(
-                              x: categoryExpenditure.keys.toList().indexOf(entry.key),
-                              barRods: [
-                                BarChartRodData(
-                                  toY: entry.value,
-                                  color: const Color(0xFF9C0A7C),
-                                  width: 22,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ],
-                              showingTooltipIndicators: [0],
-                            );
-                          }).toList(),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  final category = categoryExpenditure.keys.elementAt(value.toInt());
-                                  return RotatedBox(
-                                    quarterTurns: 3,
-                                    child: Text(
-                                      category,
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  return Text(
-                                    value.toStringAsFixed(0),
-                                    style: const TextStyle(fontSize: 12),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          borderData: FlBorderData(show: false),
-                          barTouchData: BarTouchData(
-                            touchTooltipData: BarTouchTooltipData(
-                              //tooltipBackgroundColor: const Color(0xFF9C0A7C),
-                              tooltipHorizontalAlignment: FLHorizontalAlignment.center,
-                              tooltipMargin: 10,
-                              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                final category = categoryExpenditure.keys.elementAt(group.x);
-                                final amount = categoryExpenditure.values.elementAt(group.x);
-                                return BarTooltipItem(
-                                  [
-                                    TextSpan(
-                                      text: "$category\n\$${amount.toStringAsFixed(2)}",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ] as String,
-                                  const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                      SizedBox(
+                        height: 300,
+                        child: BarChart(
+                          BarChartData(
+                            barGroups: categoryExpenditure.entries.map((entry) {
+                              return BarChartGroupData(
+                                x: categoryExpenditure.keys.toList().indexOf(entry.key),
+                                barRods: [
+                                  BarChartRodData(
+                                    toY: entry.value,
+                                    color: const Color(0xFF9C0A7C),
+                                    width: 22,
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
-                                );
-                              },
+                                ],
+                                showingTooltipIndicators: [0],
+                              );
+                            }).toList(),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    final category = categoryExpenditure.keys.elementAt(value.toInt());
+                                    return RotatedBox(
+                                      quarterTurns: 3,
+                                      child: Text(
+                                        category,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (value, meta) {
+                                    return Text(
+                                      value.toStringAsFixed(0),
+                                      style: const TextStyle(fontSize: 12),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            borderData: FlBorderData(show: false),
+                            barTouchData: BarTouchData(
+                              touchTooltipData: BarTouchTooltipData(
+                                tooltipHorizontalAlignment: FLHorizontalAlignment.center,
+                                tooltipMargin: 10,
+                                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                  final category = categoryExpenditure.keys.elementAt(group.x);
+                                  final amount = categoryExpenditure.values.elementAt(group.x);
+                                  return BarTooltipItem(
+                                    "$category\n\$${amount.toStringAsFixed(2)}",
+                                    const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -250,7 +279,6 @@ class _InsightsPageState extends State<InsightsPage> {
                   ),
                 ),
               ),
-
             // Recommendations Box
             Card(
               elevation: 4,
@@ -276,8 +304,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 ),
               ),
             ),
-
-            // Get Insights Button
+            // Refresh Insights Button
             ElevatedButton(
               onPressed: fetchInsights,
               style: ElevatedButton.styleFrom(
@@ -286,7 +313,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              child: const Text("Get Insights"),
+              child: const Text("Refresh Insights"),
             ),
           ],
         ),

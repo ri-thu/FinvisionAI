@@ -1,4 +1,6 @@
 # main.py
+# Add this import at the top of your file
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import google.generativeai as genai
 from fastapi import FastAPI, HTTPException
@@ -17,6 +19,14 @@ app = FastAPI(
     description="API for analyzing personal finances and parsing bills.",
     version="1.0.0",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins for development
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
 
 # Configure Google Generative AI
 api_key = os.getenv("GOOGLE_API_KEY")
